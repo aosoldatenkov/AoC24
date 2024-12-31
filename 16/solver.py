@@ -20,11 +20,8 @@ def locate(m, s):
 
 def solve1(inp):
     m = inp.splitlines()
-    print(len(m[0]), ' x ', len(m), ' = ', len(m[0]) * len(m))
     xs, ys = locate(m, 'S')[0]
     xe, ye = locate(m, 'E')[0]
-    print(xs, ys)
-    print(xe, ye)
     positions = {(xs, ys, -1, 0): 0}
     coords = {(xs, ys)}
     step = True
@@ -34,14 +31,12 @@ def solve1(inp):
     while step:
         step = False
         update = set()
-        print(len(positions.keys()), end='\r')
         update = {}
         for p in active:
             value = active[p]
             if value >= cost:
                 continue
             if p[0] == xe and p[1] == ye:
-                print('New path costs', value)
                 if cost > value:
                     cost = value
                 continue
@@ -64,11 +59,8 @@ def solve1(inp):
     
 def solve2(inp):
     m = inp.splitlines()
-    print(len(m[0]), ' x ', len(m), ' = ', len(m[0]) * len(m))
     xs, ys = locate(m, 'S')[0]
     xe, ye = locate(m, 'E')[0]
-    print(xs, ys)
-    print(xe, ye)
     positions = {(xs, ys, 1, 0): (0, set())}
     coords = {(xs, ys)}
     step = True
@@ -77,14 +69,12 @@ def solve2(inp):
     active = {(xs, ys, 1, 0): (0, set())}
     while step:
         step = False
-        print(len(positions.keys()), end='\r')
         update = {}
         for p in active:
             value = active[p][0]
             if value > cost:
                 continue
             if p[0] == xe and p[1] == ye:
-                print('New path costs', value)
                 if cost > value:
                     cost = value
                 continue
@@ -122,9 +112,6 @@ def solve2(inp):
         coords.add((p[0], p[1]))
         for pp in positions[p][1]:
             current.add(pp)
-    print(coords)
     return len(coords)
 
-print(solve2(inpt))
-
-#results(solve1(test), solve1(inpt), solve2(test), solve2(inpt))
+results(solve1(test), solve1(inpt), solve2(test), solve2(inpt))

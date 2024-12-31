@@ -1,8 +1,3 @@
-import itertools as it
-import re
-import math
-from functools import cache
-
 with open("test") as f_test, open("input") as f_inp:
     test = f_test.read()
     inpt = f_inp.read()
@@ -83,5 +78,4 @@ def solve2(inp):
         count += per * len(c)
     return count
 
-print(solve2(inpt))
-#results(solve1(test), solve1(inpt), solve2(test), solve2(inpt))
+results(solve1(test), solve1(inpt), solve2(test), solve2(inpt))

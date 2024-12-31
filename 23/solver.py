@@ -17,7 +17,6 @@ def solve1(inp):
     for c in con:
         names.add(c[0])
         names.add(c[1])
-    print(len(names), 'names')
     triples = set()
     for t in names:
         if t[0] != 't':
@@ -27,7 +26,6 @@ def solve1(inp):
                 if any(tr in triples for tr in it.permutations([t, p[0], p[1]], 3)):
                     continue
                 triples.add((t, p[0], p[1]))
-    #print(triples)
     return len(triples)
 
 def solve2(inp):
@@ -60,10 +58,7 @@ def solve2(inp):
     m = max(len(c) for c in clusters)
     for c in clusters:
         if len(c) == m:
-            print(c)
             cc = sorted(c)
             return ','.join(x for x in cc)
 
-print(solve2(inpt))
-
-#results(solve1(test), solve1(inpt), solve2(test), solve2(inpt))
+results(solve1(test), solve1(inpt), solve2(test), solve2(inpt))

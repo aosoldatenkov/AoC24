@@ -34,8 +34,6 @@ def solve1(inp):
                 house[y + d[1] * i][x + d[0] * i] = new_line[i]
             x, y = x + d[0], y + d[1]
     count = sum(100 * y + x for x, y in it.product(range(w), range(h)) if house[y][x] == 'O')
-#    for l in house:
-#        print(''.join(l))
     return count
 
 def move(house, x, y, d):
@@ -64,13 +62,9 @@ def solve2(inp):
     y = min(i for i in range(h) if '@' in house[i])
     x = house[y].index('@')
     for m in moves:
-        #for l in house:
-        #    print(''.join(a for a in l))
-
         if m not in dirs:
             continue
         repl = move(house, x, y, dirs[m])
-        #print(repl)
         if len(repl) == 0:
             continue
         new_house = [[a for a in l] for l in house]
@@ -82,10 +76,6 @@ def solve2(inp):
         new_house[y + dirs[m][1]][x + dirs[m][0]] = '@'
         house = [[a for a in l] for l in new_house]
         x, y = x + dirs[m][0], y + dirs[m][1]
-#    for l in house:
-#        print(''.join(a for a in l))
     return sum(100 * y + x for x, y in it.product(range(w), range(h)) if house[y][x] == '[')   
 
-print(solve2(inpt))
-
-#results(solve1(test), solve1(inpt), solve2(test), solve2(inpt))
+results(solve1(test), solve1(inpt), solve2(test), solve2(inpt))

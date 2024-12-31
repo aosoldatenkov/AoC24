@@ -1,6 +1,5 @@
 import itertools as it
 import re
-import math
 
 with open("test") as f_test, open("input") as f_inp:
     test = f_test.read()
@@ -35,7 +34,6 @@ def make_correct(u, ordering):
         new_u.insert(j, u[i])
     return new_u
         
-
 def solve2(inp):
     first, second = inp.split('\n\n')
     first = re.split(r'\W', first)
@@ -51,7 +49,6 @@ def solve2(inp):
                 break
         if not correct:
             new_u = make_correct(u, ordering)
-            #print(new_u)
             mid.append(new_u[len(new_u) // 2])
     return sum(mid)
 

@@ -1,13 +1,12 @@
 import itertools as it
-import re
-import math
+import time
 
-with open("test") as f_test, open("input") as f_inp:
-    test = f_test.read()
-    inpt = f_inp.read()
-
-def results(t1, i1, t2, i2):
-    print("Part I:\n  test:", t1, "\n  input:", i1, "\nPart II:\n  test:", t2, "\n  input:", i2)
+try: 
+    with open("test") as f_test: test = f_test.read()
+except: test = None
+try:
+    with open("input") as f_inp: inpt = f_inp.read()
+except: inpt = None
 
 def solve1(inp):
     dmap = [int(x) for x in inp.rstrip()]
@@ -21,7 +20,6 @@ def solve1(inp):
     for i in range(L):
         if front_pos % 2 == 0:
             dmap[front_pos] -= 1
-            #print(i, front_id)
             checksum += i * front_id
             if dmap[front_pos] <= 0:
                 front_id += 1
@@ -29,7 +27,6 @@ def solve1(inp):
         else:
             dmap[back_pos] -= 1
             dmap[front_pos] -= 1
-            #print(i, back_id)
             checksum += i * back_id
             if dmap[back_pos] <= 0:
                 back_id -= 1
@@ -59,7 +56,6 @@ def solve2(inp):
                 l = f[2] - f[1]
                 files[len(files) - m - 1][1] = s[0]
                 files[len(files) - m - 1][2] = s[0] + l
-                #print(files)
                 spaces[n][0] = s[0] + l
                 break
     checksum = 0
@@ -68,4 +64,20 @@ def solve2(inp):
             checksum += f[0] * i
     return checksum
 
-results(solve1(test), solve1(inpt), solve2(test), solve2(inpt))
+def run():
+    if test:
+        t1 = time.time()
+        r1 = solve1(test)
+        t2 = time.time()
+        r2 = solve2(test)
+        t3 = time.time()
+        print("Test I:", r1, f'{t2 - t1:10.3f}s', "\nTest II:", r2, f'{t3 - t2:10.3f}s')
+    if inpt:
+        t1 = time.time()
+        r1 = solve1(inpt)
+        t2 = time.time()
+        r2 = solve2(inpt)
+        t3 = time.time()
+        print("Part I:", r1, f'{t2 - t1:10.3f}s', "\nPart II:", r2, f'{t3 - t2:10.3f}s')
+
+run()

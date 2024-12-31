@@ -1,7 +1,6 @@
 import itertools as it
 import re
-import math
-from functools import cache
+from collections import Counter
 
 with open("test") as f_test, open("input") as f_inp:
     test = f_test.read()
@@ -28,20 +27,13 @@ def solve2(inp):
     h = 103
     w = 101
     maxx = []
+    pos = [(px[i], py[i]) for i in range(len(px))]
     for t in range(101 * 103):
-        pos = [((px[i] + t * vx[i]) % w, (py[i] + t * vy[i]) % h) for i in range(len(px))]
-        max_l = 1
-        for x, y in it.product(range(w), range(h)):
-            ll = [u for u in range(10) if (x + u, y) not in pos]
-            ll.append(10)
-            if min(ll) > max_l:
-                max_l = min(ll)
-                break
-        if max_l > 2:
-            print('t=', t, 'l=', max_l)
-        maxx.append(max_l)
+        counts = Counter((p[0] // 5, p[1] // 5) for p in pos)
+        m = counts.most_common(1)[0]
+        if m[1] > 20:
+            return t
+        pos = [((pos[i][0] + vx[i]) % w, (pos[i][1] + vy[i]) % h) for i in range(len(px))]
     return 0
 
-print(solve2(inpt))
-
-#results(solve1(test), solve1(inpt), solve2(test), solve2(inpt))
+results(solve1(test), solve1(inpt), solve2(test), solve2(inpt))

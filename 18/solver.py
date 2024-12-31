@@ -1,63 +1,57 @@
-import itertools as it
-import re
-import math
-from functools import cache
+import time
 
-with open("test") as f_test, open("input") as f_inp:
-    test = f_test.read()
-    inpt = f_inp.read()
+try: 
+    with open("test") as f_test: test = f_test.read()
+except: test = None
+try:
+    with open("input") as f_inp: inpt = f_inp.read()
+except: inpt = None
 
-def results(t1, i1, t2, i2):
-    print("Part I:\n  test:", t1, "\n  input:", i1, "\nPart II:\n  test:", t2, "\n  input:", i2)
+dirs = [(-1, 0), (1, 0), (0, -1), (0, 1)]    
 
-def solve1(inp):
-    m = [['.' for x in range(71)] for y in range(71)]
-    inp = inp.splitlines()
-    for i in range(1024):
-        x, y = map(int, inp[i].split(','))
-        m[y][x] = '#'
-    pos = {(0, 0): 0}
-    dirs = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-    new = {(0, 0)}
-    while len(new) > 0:
-        x, y = new.pop()
-        val = pos[(x, y)]
-        for dx, dy in dirs:
-            x1, y1 = x + dx, y + dy
-            if x1 < 0 or x1 > 70 or y1 < 0 or y1 > 70:
-                continue
-            if m[y1][x1] == '.' and ((x1, y1) not in pos or pos[(x1, y1)] > val + 1):
-                pos[(x1, y1)] = val + 1
-                new.add((x1, y1))
-    return pos[(70, 70)]
+def minpath(w, h, walls, x, y):
+    out = {(x, y): 0}
+    new = [(x, y)]
+    while new:
+        p = new.pop(0)
+        for d in dirs:
+            q = (p[0] + d[0], p[1] + d[1])
+            if q not in out and 0 <= q[0] < w and 0 <= q[1] < h and q not in walls:
+                out[q] = out[p] + 1
+                new.append(q)
+    return out
+
+def solve1(inp, d, n):
+    walls = [tuple(int(a) for a in l.split(',')) for l in inp.splitlines()]
+    dist = minpath(d, d, walls[:n], 0, 0)
+    return dist[d - 1, d - 1]
     
-def solve2(inp):
-    m = [['.' for x in range(71)] for y in range(71)]
-    inp = inp.splitlines()
-    for i in range(1024):
-        x, y = map(int, inp[i].split(','))
-        m[y][x] = '#'
-    dirs = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-    for i in range(1024, len(inp)):
-        a, b = map(int, inp[i].split(','))
-        m[b][a] = '#'
-        pos = {(0, 0): 0}
-        new = {(0, 0)}
-        while len(new) > 0:
-            x, y = new.pop()
-            val = pos[(x, y)]
-            for dx, dy in dirs:
-                x1, y1 = x + dx, y + dy
-                if x1 < 0 or x1 > 70 or y1 < 0 or y1 > 70:
-                    continue
-                if m[y1][x1] == '.' and ((x1, y1) not in pos or pos[(x1, y1)] > val + 1):
-                    pos[(x1, y1)] = val + 1
-                    new.add((x1, y1))
-        if (70, 70) not in pos:
-            return a, b
-    return 0
-    
+def solve2(inp, d):
+    walls = [tuple(int(a) for a in l.split(',')) for l in inp.splitlines()]
+    head, tail = 0, len(walls) - 1
+    while head < tail:
+        mid = (head + tail) // 2
+        dist = minpath(d, d, walls[:mid + 1], 0, 0)
+        if (d - 1, d - 1) not in dist:
+            tail = mid
+        else:
+            head = mid + 1
+    return walls[head]
 
-print(solve2(inpt))
+def run():
+    if test:
+        t1 = time.time()
+        assert (r1 := solve1(test, 7, 12)) == 22
+        t2 = time.time()
+        assert (r2 := solve2(test, 7)) == (6, 1)
+        t3 = time.time()
+        print("Test I:", r1, f'{t2 - t1:10.3f}s', "\nTest II:", r2, f'{t3 - t2:10.3f}s')
+    if inpt:
+        t1 = time.time()
+        assert (r1 := solve1(inpt, 71, 1024)) == 340
+        t2 = time.time()
+        assert (r2 := solve2(inpt, 71)) == (34, 32)
+        t3 = time.time()
+        print("Part I:", r1, f'{t2 - t1:10.3f}s', "\nPart II:", r2, f'{t3 - t2:10.3f}s')
 
-#results(solve1(test), solve1(inpt), solve2(test), solve2(inpt))
+run()

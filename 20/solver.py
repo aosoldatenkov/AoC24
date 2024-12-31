@@ -1,101 +1,80 @@
 import itertools as it
-import re
-import math
-from functools import cache
+import time
 
-with open("test") as f_test, open("input") as f_inp:
-    test = f_test.read()
-    inpt = f_inp.read()
+try: 
+    with open("test") as f_test: test = f_test.read()
+except: test = None
+try:
+    with open("input") as f_inp: inpt = f_inp.read()
+except: inpt = None
 
-def results(t1, i1, t2, i2):
-    print("Part I:\n  test:", t1, "\n  input:", i1, "\nPart II:\n  test:", t2, "\n  input:", i2)
+dirs = [(-1, 0), (1, 0), (0, -1), (0, 1)]    
 
-dirs = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+def minpath(space, x, y):
+    out = {(x, y): 0}
+    new = [(x, y)]
+    while new:
+        p = new.pop(0)
+        for d in dirs:
+            q = (p[0] + d[0], p[1] + d[1])
+            if q not in out and q in space:
+                out[q] = out[p] + 1
+                new.append(q)
+    return out
 
-wmap = [[a for a in l] for l in inpt.splitlines()]
+def readmap(inp):
+    return {(x, y): v for y, l in enumerate(inp.splitlines()) for x, v in enumerate(l)}
 
-def race(inp, xs, ys, xe, ye):
-    pos = {(xs, ys): 0}
-    new = {(xs, ys)}
-    while len(new) > 0:
-        px, py = new.pop()
-        for dx, dy in dirs:
-            x, y = px + dx, py + dy
-            if wmap[y][x] != '#' and ((x, y) not in pos or pos[(x, y)] > pos[(px, py)] + 1):
-                pos[(x, y)] = pos[(px, py)] + 1
-                new.add((x, y))
-    return pos
-
-@cache
-def race2(xs, ys, xe, ye):
-    pos = {(xs, ys): 0}
-    new = {(xs, ys)}
-    while len(new) > 0:
-        px, py = new.pop()
-        for dx, dy in dirs:
-            x, y = px + dx, py + dy
-            if wmap[y][x] != '#' and ((x, y) not in pos or pos[(x, y)] > pos[(px, py)] + 1):
-                pos[(x, y)] = pos[(px, py)] + 1
-                new.add((x, y))
-    return pos[(xe, ye)]
-
-def solve1(inp):
-    inp = [[a for a in l] for l in inp.splitlines()]
-    ys = min(i for i in range(len(inp)) if 'S' in inp[i])
-    xs = inp[ys].index('S')
-    ye = min(i for i in range(len(inp)) if 'E' in inp[i])
-    xe = inp[ye].index('E')
-    h = len(inp)
-    w = len(inp[0])
-    base = race(inp, xs, ys, xe, ye)
+def solve1(inp, t):
+    w = readmap(inp)
+    xs, ys = {(x, y) for x, y in w if w[x, y] == 'S'}.pop()
+    space = {(x, y) for x, y in w if w[x, y] != '#'}
+    base = minpath(space, xs, ys)
     count = 0
-    print(w, h)
-    for j in range(1, h - 1):
-        for i in range(1, w - 1):
-            print(i, j, end='\r')
-            if inp[j][i] != '#' or all(inp[j + dy][i + dx] == '#' for dx, dy in dirs):
-                continue
-            for a, b in dirs:
-                if 0 < i + a < w - 1 and 0 < j + b < h - 1 and inp[j + b][i + a] != '#':
-                    r1 = min(base[(i + dx, j + dy)] for dx, dy in dirs if (i + dx, j + dy) in base) + 1
-                    second = race(inp, i + a, j + b, xe, ye)
-                    r2 = second[(xe, ye)]
-                    dif = base[(xe, ye)] - r1 - r2 - 1
-                    if dif >= 20:
-                        #print(dif)
-                        count += 1
-    print('')
+    for x, y in w:
+        if w[x, y] != '#':
+            continue
+        for d1, d2 in it.combinations(dirs, 2):
+            x1, y1 = x + d1[0], y + d1[1]
+            x2, y2 = x + d2[0], y + d2[1]
+            if (x1, y1) in base and (x2, y2) in base:
+                a, b = base[x1, y1], base[x2, y2]
+                if abs(b - a) - 2 >= t:
+                    count += 1
     return count
 
-def solve2(inp):
-    wmap = [[a for a in l] for l in inp.splitlines()]
-    inp = [[a for a in l] for l in inp.splitlines()]
-    
-    ys = min(i for i in range(len(inp)) if 'S' in inp[i])
-    xs = inp[ys].index('S')
-    ye = min(i for i in range(len(inp)) if 'E' in inp[i])
-    xe = inp[ye].index('E')
-    h = len(inp)
-    w = len(inp[0])
-    base = race2(xs, ys, xe, ye)
+def solve2(inp, t):
+    w = readmap(inp)
+    xs, ys = {(x, y) for x, y in w if w[x, y] == 'S'}.pop()
+    space = {(x, y) for x, y in w if w[x, y] != '#'}
+    base = minpath(space, xs, ys)
+    path = {base[x, y]: (x, y) for x, y in base}
     count = 0
-    print(w, h)
-    for j in range(1, h - 1):
-        for i in range(1, w - 1):
-            print(i, j, end='\r')
-            if inp[j][i] == '#':# or all(inp[j + dy][i + dx] == '#' for dx, dy in dirs):
-                continue
-            for a, b in it.product(range(1, w - 1), range(1, h - 1)):
-                if abs(i - a) + abs(j - b) <= 20 and inp[b][a] != '#':
-                    r1 = race2(xs, ys, i, j) #min(base[(i + dx, j + dy)] for dx, dy in dirs if (i + dx, j + dy) in base)
-                    r2 = race2(a, b, xe, ye)
-                    dif = base - r1 - r2 - (abs(i - a) + abs(j - b))
-                    if dif >= 100:
-#                        print(i, j, a, b)
-                        count += 1
-    print('')
+    for a, b in it.combinations(range(len(path)), 2):
+        p, q = path[a], path[b]
+        d = abs(p[0] - q[0]) + abs(p[1] - q[1])
+        if d <= 20 and b - a - d >= t:
+            count += 1
     return count
 
-print(solve2(inpt))
+def run():
+    if test:
+        t1 = time.time()
+        r1 = solve1(test, 64)
+        t2 = time.time()
+        r2 = solve2(test, 76)
+        t3 = time.time()
+        assert r1 == 1
+        assert r2 == 3
+        print("Test I:", r1, f'{t2 - t1:10.3f}s', "\nTest II:", r2, f'{t3 - t2:10.3f}s')
+    if inpt:
+        t1 = time.time()
+        r1 = solve1(inpt, 100)
+        t2 = time.time()
+        r2 = solve2(inpt, 100)
+        t3 = time.time()
+        assert r1 == 1507
+        assert r2 == 1037936
+        print("Part I:", r1, f'{t2 - t1:10.3f}s', "\nPart II:", r2, f'{t3 - t2:10.3f}s')
 
-#results(solve1(test), solve1(inpt), solve2(test), solve2(inpt))
+run()

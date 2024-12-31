@@ -1,13 +1,13 @@
 import itertools as it
-import re
-import math
+import time
+from functools import cache
 
-with open("test") as f_test, open("input") as f_inp:
-    test = f_test.read()
-    inpt = f_inp.read()
-
-def results(t1, i1, t2, i2):
-    print("Part I:\n  test:", t1, "\n  input:", i1, "\nPart II:\n  test:", t2, "\n  input:", i2)
+try: 
+    with open("test") as f_test: test = f_test.read()
+except: test = None
+try:
+    with open("input") as f_inp: inpt = f_inp.read()
+except: inpt = None
 
 def solve1(inp):
     inp = inp.splitlines()
@@ -27,6 +27,7 @@ def solve1(inp):
                 break
     return count
 
+@cache
 def compute(vals):
     if len(vals) == 1:
         yield int(vals[0])
@@ -43,11 +44,30 @@ def solve2(inp):
     for l in inp:
         left, right = l.split(':')
         res = int(left)
-        vals = [a for a in right.split()]
+        vals = tuple(a for a in right.split())
         for v in compute(vals):
             if v == res:
                 count += res
                 break
     return count
 
-results(solve1(test), solve1(inpt), solve2(test), solve2(inpt))
+def run():
+    if test:
+        t1 = time.time()
+        r1 = solve1(test)
+        t2 = time.time()
+        r2 = solve2(test)
+        t3 = time.time()
+        assert r1 == 3749, r2 == 11387
+        print("Test I:", r1, f'{t2 - t1:10.3f}s', "\nTest II:", r2, f'{t3 - t2:10.3f}s')
+    if inpt:
+        t1 = time.time()
+        r1 = solve1(inpt)
+        t2 = time.time()
+        r2 = solve2(inpt)
+        t3 = time.time()
+        assert r1 == 5512534574980, r2 == 328790210468594
+        print("Part I:", r1, f'{t2 - t1:10.3f}s', "\nPart II:", r2, f'{t3 - t2:10.3f}s')
+
+run()
+

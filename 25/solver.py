@@ -39,4 +39,3 @@ def solve2(inp):
 
 print(solve1(inpt))
 
-#results(solve1(test), solve1(inpt), solve2(test), solve2(inpt))

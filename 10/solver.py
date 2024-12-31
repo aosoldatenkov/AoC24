@@ -1,7 +1,3 @@
-import itertools as it
-import re
-import math
-
 with open("test") as f_test, open("input") as f_inp:
     test = f_test.read()
     inpt = f_inp.read()
